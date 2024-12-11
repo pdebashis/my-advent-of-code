@@ -16,9 +16,6 @@ class Day5 {
     val after_pages :Map[Int,List[Int]] = ordering.groupBy( _._1).map( x => (x._1, x._2.map(_._2)))
     val before_pages :Map[Int,List[Int]] = ordering.map{case (a,b)=>(b,a)}.groupBy(_._1).map( x => (x._1, x._2.map(_._2)))
 
-    println(after_pages)
-    println(before_pages)
-
     def midIfValid(page: Seq[Int]) :Int = {
       val valid = page.indices.forall{ i =>
         val left = page.take(i)
@@ -32,7 +29,7 @@ class Day5 {
       else 0
     }
 
-    def midAll(page: Seq[Int]) :Int = {
+    def mid(page: Seq[Int]) :Int = {
       ordering.filter( x => page.contains(x._1) && page.contains(x._2))
         .groupBy(_._1).mapValues(_.size)
         .filter( _._2 == page.size/2 )
@@ -41,7 +38,7 @@ class Day5 {
     }
 
     val output1 = pages.map(x => midIfValid(x)).sum
-    val output2 = pages.map(x => midAll(x)).sum - output1
+    val output2 = pages.map(x => mid(x)).sum - output1
 
     println(output1)
     println(output2)
