@@ -1,10 +1,15 @@
 import scala.io.Source
 
 class ??? {
-  def run(inputFile: String) =  {
+  def run(inputFile: String) :Unit =  {
     val startTime = System.nanoTime()
     println(s"Executing for ${inputFile.split("/").last}")
-    val input = Source.fromFile(inputFile).getLines().toList
+    val source = scala.io.Source.fromFile(inputFile)
+    val input = try{
+      source.getLines.toList
+    } finally {
+      source.close()
+    }
 
     val output1 = 0
     val output2 = 0

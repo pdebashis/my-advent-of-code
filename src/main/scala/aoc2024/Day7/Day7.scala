@@ -2,12 +2,18 @@ package aoc2024.Day7
 
 import scala.annotation.tailrec
 import scala.io.Source
+import scala.util.Using
 
 class Day7 {
-  def run(inputFile: String) =  {
+  def run(inputFile: String):Unit =  {
     val startTime = System.nanoTime()
     println(s"Executing for ${inputFile.split("/").last}")
-    val input = Source.fromFile(inputFile).getLines().toList
+    val source = scala.io.Source.fromFile(inputFile)
+    val input = try{
+      source.getLines.toList
+    } finally {
+      source.close()
+    }
 
     def evaluate(nums : List[Long], t: Long, partTwo: Boolean) : Boolean = {
       val new_t_mul = if(t % nums.head == 0) t / nums.head else -1
@@ -43,6 +49,7 @@ class Day7 {
     val endTime = System.nanoTime()
     val duration = (endTime - startTime) / 1e9d
     println(s"Runtime: $duration seconds")
+
   }
 }
 
