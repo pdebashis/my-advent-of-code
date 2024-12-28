@@ -2,3 +2,6 @@ src/main/resources/parameters.conf
 src/main/scala/aoc2024/Day*/Input.txt
 src/main/scala/aoc2024/Day*/Description.md
 target/
+project/
+.bsp/
+.idea/
