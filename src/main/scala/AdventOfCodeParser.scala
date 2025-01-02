@@ -7,8 +7,8 @@ import scala.io.Source
 object AdventOfCodeParser {
 
     def main(args: Array[String]): Unit = {
-        val day = "10"
-        val year = "2024"
+        val day = "2"
+        val year = "2021"
         val url = s"https://adventofcode.com/$year/day/$day"
         val dest = s"./src/main/scala/aoc$year/Day$day"
         val templateSolution = "./src/main/scala/SolveTemplate.scala"
