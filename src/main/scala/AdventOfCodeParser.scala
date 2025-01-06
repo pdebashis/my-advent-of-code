@@ -7,7 +7,7 @@ import scala.io.Source
 object AdventOfCodeParser {
 
     def main(args: Array[String]): Unit = {
-        val day = "2"
+        val day = "4"
         val year = "2021"
         val url = s"https://adventofcode.com/$year/day/$day"
         val dest = s"./src/main/scala/aoc$year/Day$day"
@@ -59,9 +59,12 @@ object AdventOfCodeParser {
                 println(s"File already exists at: $solutionPath")
             } else {
                 Files.copy(Paths.get(templateSolution),Paths.get(solutionPath))
-                val content = Source.fromFile(solutionPath)(StandardCharsets.UTF_8).mkString
-                val packageName = s"package aoc${year}.Day${day}\n\n"
-                val updatedContent = packageName.appendedAll(content).replace("???", s"Day${day}")
+                val source = Source.fromFile(solutionPath)(StandardCharsets.UTF_8)
+                val content = source.mkString
+                source.close()
+
+                val packageName = s"package aoc$year.Day$day\n\n"
+                val updatedContent = packageName.appendedAll(content).replace("???", s"Day$day")
                   .replace("%YEAR%", year)
                   .replace("%DAY%",day)
                 Files.write(Paths.get(solutionPath), updatedContent.getBytes(StandardCharsets.UTF_8))
