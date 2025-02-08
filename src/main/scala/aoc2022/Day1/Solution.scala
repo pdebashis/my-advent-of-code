@@ -13,8 +13,20 @@ class Day1 {
       source.close()
     }
 
-    val output1 = 0
-    val output2 = 0
+    val calories = (input :+ "").foldLeft((List[List[Int]](), List[Int]()) )( (acc, curr) =>
+      if(curr.isBlank) {
+        val total_list = acc._1 :+ acc._2
+        val acc_list = List[Int]()
+        (total_list,acc_list)
+      }
+      else {
+        val acc_list = acc._2 :+ curr.toInt
+        (acc._1, acc_list)
+      }
+    )._1
+
+    val output1 = calories.map(_.sum).max
+    val output2 = calories.map(_.sum).sortBy(-_).take(3).sum
 
     println(output1)
     println(output2)
@@ -30,6 +42,6 @@ object Day1 {
     val app = new Day1()
 
     app.run("./src/main/scala/aoc2022/Day1/Example.txt")
-//    app.run("./src/main/scala/aoc2022/Day1/Input.txt")
+    app.run("./src/main/scala/aoc2022/Day1/Input.txt")
   }
 }

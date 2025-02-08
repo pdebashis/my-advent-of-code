@@ -7,7 +7,7 @@ import scala.io.Source
 object AdventOfCodeParser {
 
     def main(args: Array[String]): Unit = {
-        val day = "5"
+        val day = "6"
         val year = "2021"
         val url = s"https://adventofcode.com/$year/day/$day"
         val dest = s"./src/main/scala/aoc$year/Day$day"
