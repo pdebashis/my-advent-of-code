@@ -27,7 +27,7 @@ object Day1 {
   def main(args: Array[String]): Unit = {
     val app = new Day1()
     app.run("./src/main/scala/aoc2024/Day1/Example.txt")
-    app.run("./src/main/scala/aoc2024/Day1/Input.txt")
+    // app.run("./src/main/scala/aoc2024/Day1/Input.txt")
   }
 
 }
