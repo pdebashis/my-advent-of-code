@@ -4,35 +4,42 @@ import scala.io.Source
 
 class Day3 {
 
-  def asc_desc_gradual(row : List[Int]) = {
-    val difference_list = row.foldLeft(List[(Int, Int)]()){ (acc, curr) =>
-      if(acc.isEmpty) acc :+ (curr,0)
-      else acc :+ (curr, curr-acc.last._1)
-    }.tail.map(_._2)
+  // def max_joltage(line: String): Int = {
+  //   val batteries = line.map(_.toString.toInt).toArray.toList
+  //   val max_first_digit = batteries.take(batteries.length - 1).max
+  //   val max_first_index = batteries.indexOf(max_first_digit)
+  //   val max_second_digit = batteries.drop(max_first_index+1).max
 
-    val asc_gradual = difference_list.forall( x => x > 0 && x <= 3)
-    val desc_gradual = difference_list.forall( x => x < 0 && x >= -3)
-    asc_gradual || desc_gradual
-  }
+  //   // println(s"Max joltage: ${max_first_digit} * 10 + ${max_second_digit} = ${max_first_digit*10 + max_second_digit}")
+  //   max_first_digit*10 + max_second_digit
+  // }
 
-  def asc_gradual_conservative(row : List[Int]) = {
-    val asc_desc : Boolean = asc_desc_gradual(row)
-    if(asc_desc){
-      true
-    }else {
-      row.indices.exists { i =>
-        val without_i = row.take(i) ++ row.drop(i + 1)
-        asc_desc_gradual(without_i)
-      }
+  def max_joltage_n(line: String, n: Int): String = {
+    //Functions-------------------------------------------------
+    if (n == 1) {
+      return line.max.toString
     }
+    // println(s"Finding max in Line: ${line} for size n: ${n}")
+    val batteries = line.map(_.toString.toInt).toArray.toList
+    val max_first_digit = batteries.take(batteries.length - (n-1)).max
+    // println(s"Found max digit: ${max_first_digit} in ${batteries.take(batteries.length - (n-1))}")
+    val rest_batteries = max_joltage_n(line.drop(batteries.indexOf(max_first_digit)+1), n-1)
+
+    max_first_digit.toString + max_joltage_n(line.drop(batteries.indexOf(max_first_digit)+1), n-1)
   }
 
   def run(inputFile: String) =  {
+    // Read Input-------------------------------------------------
     println(s"Executing for ${inputFile.split("/").last}")
-    val input = Source.fromFile(inputFile).getLines().toList
+    val input = Source.fromFile(inputFile).getLines().toList //["987654321111111","987654321111111"]
 
-    val output1 = input.map( x=> x.split("\\s+").map(_.toInt).toList).filter( row => asc_desc_gradual(row)).size
-    val output2 = input.map( x=> x.split("\\s+").map(_.toInt).toList).filter( row => asc_gradual_conservative(row)).size
+    //Logic-------------------------------------------------------
+
+    // input.map(max_joltage_n(_, 2))
+
+    //Output-------------------------------------------------------
+    val output1 = input.map(max_joltage_n(_, 2)).map(_.toLong).sum
+    val output2 = input.map(max_joltage_n(_, 12)).map(_.toLong).sum
 
     println(output1)
     println(output2)
@@ -42,7 +49,10 @@ class Day3 {
 object Day2 {
   def main(args: Array[String]): Unit = {
     val app = new Day3()
-    app.run("./src/main/scala/aoc2024/Day2/Example.txt")
-    app.run("./src/main/scala/aoc2024/Day2/Input.txt")
+
+    println(app.max_joltage_n("818181911112111", 12))
+
+    // app.run("./src/main/scala/aoc2025/Day3/Example.txt")
+    app.run("./src/main/scala/aoc2025/Day3/Input.txt")
   }
 }
