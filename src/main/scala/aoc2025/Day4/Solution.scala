@@ -13,8 +13,56 @@ class Day4 {
       source.close()
     }
 
-    val output1 = 0
-    val output2 = 0
+    val grid = input.toArray
+    val directions = Seq(
+      (-1,-1),  (-1,0),   (-1,1),
+      (0 ,-1),            (0 ,1),
+      (1 ,-1),  (1 ,0),   (1 ,1)
+    )
+    val width = grid(0).length
+    val height = grid.length
+    def validX(x: Int): Boolean = x >= 0 && x < height
+    def validY(y: Int): Boolean = y >= 0 && y < width
+    def count_adjacent_rolls(grid: Array[String] ,x: Int, y: Int): Int = {
+      directions.map { case (dx, dy) =>
+        val newX = x + dx
+        val newY = y + dy
+        if (validX(newX) && validY(newY) && grid(newX)(newY) == '@') 1 else 0
+      }.sum
+    }
+    def toGrid(indexedSeq: IndexedSeq[Char]) = indexedSeq.grouped(width).map(_.mkString).toArray
+    def toSeq(grid: Array[String]) = grid.toIndexedSeq.flatMap(_.toCharArray())
+
+    val removed_rolls = (
+      for(x <- grid.indices; 
+          y <- grid(x).indices) 
+      yield {
+        val curr = grid(x)(y)
+        if(curr == '@')
+          if(count_adjacent_rolls(grid, x, y) < 4) 'x' else curr
+        else
+          curr
+      })
+
+    val output1 = removed_rolls.count(_ == 'x')
+    
+    def keep_removing_rolls(grid: Array[String], newGrid: Array[String]) :Array[String] = {
+      // println(s"Current Grid: ${toSeq(grid).count(_ == 'x')} removed rolls")
+      // println(s"Removed: ${toSeq(newGrid).count(_ == 'x')} rolls")
+      if(toSeq(grid).count(_ == 'x') == toSeq(newGrid).count(_ == 'x')) {
+        newGrid
+      } else {
+        val next = (for(x <- newGrid.indices; y <- newGrid(x).indices) yield {
+          val curr = newGrid(x)(y)
+          if(curr == '@')
+            if(count_adjacent_rolls(newGrid, x, y) < 4) 'x' else curr
+          else
+            curr
+        })
+        keep_removing_rolls(newGrid, toGrid(next))
+      }
+    }
+    val output2 = toSeq(keep_removing_rolls(grid, toGrid(removed_rolls))).count(_ == 'x')
 
     println(output1)
     println(output2)
@@ -30,6 +78,6 @@ object Day4 {
     val app = new Day4()
 
     app.run("./src/main/scala/aoc2025/Day4/Example.txt")
-//    app.run("./src/main/scala/aoc2025/Day4/Input.txt")
+    app.run("./src/main/scala/aoc2025/Day4/Input.txt")
   }
 }
