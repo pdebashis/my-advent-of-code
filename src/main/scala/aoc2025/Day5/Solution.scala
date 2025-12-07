@@ -3,46 +3,68 @@ package aoc2025.Day5
 import scala.io.Source
 
 class Day5 {
-
-  def asc_desc_gradual(row : List[Int]) = {
-    val difference_list = row.foldLeft(List[(Int, Int)]()){ (acc, curr) =>
-      if(acc.isEmpty) acc :+ (curr,0)
-      else acc :+ (curr, curr-acc.last._1)
-    }.tail.map(_._2)
-
-    val asc_gradual = difference_list.forall( x => x > 0 && x <= 3)
-    val desc_gradual = difference_list.forall( x => x < 0 && x >= -3)
-    asc_gradual || desc_gradual
-  }
-
-  def asc_gradual_conservative(row : List[Int]) = {
-    val asc_desc : Boolean = asc_desc_gradual(row)
-    if(asc_desc){
-      true
-    }else {
-      row.indices.exists { i =>
-        val without_i = row.take(i) ++ row.drop(i + 1)
-        asc_desc_gradual(without_i)
+  def recursivelyShortenRanges(ranges: List[(Long, Long)]): List[(Long, Long)] = {
+    def helper(ranges: List[(Long, Long)], acc: List[(Long, Long)]): List[(Long, Long)] = {
+      ranges match {
+        case Nil => acc.reverse
+        case head :: tail =>
+          acc match {
+            case Nil => helper(tail, head :: acc)
+            case last :: rest =>
+              if (head._1 <= last._2 + 1) {
+                val merged = (last._1, Math.max(last._2, head._2))
+                helper(tail, merged :: rest)
+              } else {
+                helper(tail, head :: acc)
+              }
+          }
       }
     }
+    helper(ranges, Nil)
   }
 
-  def run(inputFile: String) =  {
+  def run(inputFile: String) :Unit =  {
+    val startTime = System.nanoTime()
     println(s"Executing for ${inputFile.split("/").last}")
-    val input = Source.fromFile(inputFile).getLines().toList
+    val source = scala.io.Source.fromFile(inputFile)
+    val input = try{
+      source.getLines.toList
+    } finally {
+      source.close()
+    }
 
-    val output1 = input.map( x=> x.split("\\s+").map(_.toInt).toList).filter( row => asc_desc_gradual(row)).size
-    val output2 = input.map( x=> x.split("\\s+").map(_.toInt).toList).filter( row => asc_gradual_conservative(row)).size
+    val ingredients = input.filter(_.nonEmpty).filterNot(_.contains("-")).map(_.toLong)
+    
+    val fresh_ranges = input.filter(_.nonEmpty).filter(_.contains("-")).map { line =>
+      val parts = line.split("-").take(2).map(_.toLong)
+      (parts(0), parts(1))
+    }.sortBy(_._1)
+
+    val checks = ingredients.map { x =>
+      fresh_ranges.exists{
+        case (start, end) => x >= start && x <= end
+      }}
+
+    val fresh_ranges_reduced = recursivelyShortenRanges(fresh_ranges)
+    
+    val output1 = checks.count(_ == true)
+    val output2 = fresh_ranges_reduced.map{
+       case (start, end) => end - start + 1}.sum
 
     println(output1)
     println(output2)
+
+    val endTime = System.nanoTime()
+    val duration = (endTime - startTime) / 1e9d
+    println(s"Runtime: $duration seconds")
   }
 }
 
-object Day2 {
+object Day5 {
   def main(args: Array[String]): Unit = {
     val app = new Day5()
-    app.run("./src/main/scala/aoc2024/Day2/Example.txt")
-    app.run("./src/main/scala/aoc2024/Day2/Input.txt")
+
+    app.run("./src/main/scala/aoc2025/Day5/Example.txt")
+    app.run("./src/main/scala/aoc2025/Day5/Input.txt")
   }
 }

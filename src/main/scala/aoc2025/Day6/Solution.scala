@@ -3,46 +3,53 @@ package aoc2025.Day6
 import scala.io.Source
 
 class Day6 {
-
-  def asc_desc_gradual(row : List[Int]) = {
-    val difference_list = row.foldLeft(List[(Int, Int)]()){ (acc, curr) =>
-      if(acc.isEmpty) acc :+ (curr,0)
-      else acc :+ (curr, curr-acc.last._1)
-    }.tail.map(_._2)
-
-    val asc_gradual = difference_list.forall( x => x > 0 && x <= 3)
-    val desc_gradual = difference_list.forall( x => x < 0 && x >= -3)
-    asc_gradual || desc_gradual
-  }
-
-  def asc_gradual_conservative(row : List[Int]) = {
-    val asc_desc : Boolean = asc_desc_gradual(row)
-    if(asc_desc){
-      true
-    }else {
-      row.indices.exists { i =>
-        val without_i = row.take(i) ++ row.drop(i + 1)
-        asc_desc_gradual(without_i)
-      }
-    }
-  }
-
-  def run(inputFile: String) =  {
+  def run(inputFile: String) :Unit =  {
+    val startTime = System.nanoTime()
     println(s"Executing for ${inputFile.split("/").last}")
-    val input = Source.fromFile(inputFile).getLines().toList
+    val source = scala.io.Source.fromFile(inputFile)
+    val input = try{
+      source.getLines.toList
+    } finally {
+      source.close()
+    }
 
-    val output1 = input.map( x=> x.split("\\s+").map(_.toInt).toList).filter( row => asc_desc_gradual(row)).size
-    val output2 = input.map( x=> x.split("\\s+").map(_.toInt).toList).filter( row => asc_gradual_conservative(row)).size
+    val num_lines = input.filterNot(_.contains("*")).map{ line => 
+      line.trim.replaceAll("\\s+", " ").split(" ").map(_.toLong)
+    }
+    val ops_line = input.filter(_.contains("*")).head.trim.replaceAll("\\s+", " ").split(" ")
+    val math_processor = for(i <- ops_line.indices) yield ({ 
+      val num_list = num_lines.map(_(i))
+      ops_line(i) match {
+        case "*" => num_list.reduce(_ * _)
+        case "+" => num_list.reduce(_ + _)
+        case _ => 0
+      }
+    })
+    
+    //println(math_processor)
+
+    val num_lines_new = input.filterNot(_.contains("*")).transpose.map(_.filterNot(_ == ' ')).filterNot( _ == List())
+    val nums_list_new = num_lines_new.map(_.mkString)
+    
+    println(nums_list_new)
+
+    val output1 = math_processor.sum
+    val output2 = 0 //math_processor_c.sum
 
     println(output1)
     println(output2)
+
+    val endTime = System.nanoTime()
+    val duration = (endTime - startTime) / 1e9d
+    println(s"Runtime: $duration seconds")
   }
 }
 
-object Day2 {
+object Day6 {
   def main(args: Array[String]): Unit = {
     val app = new Day6()
-    app.run("./src/main/scala/aoc2024/Day2/Example.txt")
-    app.run("./src/main/scala/aoc2024/Day2/Input.txt")
+
+  app.run("./src/main/scala/aoc2025/Day6/Example.txt")
+  // app.run("./src/main/scala/aoc2025/Day6/Input.txt")
   }
 }
