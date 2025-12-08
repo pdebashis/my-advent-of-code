@@ -14,9 +14,10 @@ class Day6 {
     }
 
     val num_lines = input.filterNot(_.contains("*")).map{ line => 
-      line.trim.replaceAll("\\s+", " ").split(" ").map(_.toLong)
+      line.trim.split("\\s+").filter(_.nonEmpty).map(_.toLong)
     }
     val ops_line = input.filter(_.contains("*")).head.trim.replaceAll("\\s+", " ").split(" ")
+
     val math_processor = for(i <- ops_line.indices) yield ({ 
       val num_list = num_lines.map(_(i))
       ops_line(i) match {
@@ -26,15 +27,40 @@ class Day6 {
       }
     })
     
-    //println(math_processor)
+    val num_lines_new = input.filterNot(_.contains("*")).transpose
+    val nums_list_new = num_lines_new.map(_.mkString).map{ x=> 
+      if(x.replaceAll("\\s+","").isEmpty()) 
+        "" 
+      else 
+        x
+    }
 
-    val num_lines_new = input.filterNot(_.contains("*")).transpose.map(_.filterNot(_ == ' ')).filterNot( _ == List())
-    val nums_list_new = num_lines_new.map(_.mkString)
+    val folded = nums_list_new.foldLeft(List[List[String]]()){ (acc, curr) => 
+      curr match {
+        case "" => Nil :: acc
+        case _ => acc match {
+          case Nil => List(List(curr))
+          case head :: tail => (curr :: head) :: tail
+        }
+      }
+    }.reverse
     
-    println(nums_list_new)
+    // println(ops_line.foreach(println))
+    // println(ops_line.indices)
+    // println(ops_line.length)
+    // println(num_lines_2)
+
+    val math_processor_2 = for(i <- ops_line.indices) yield ({ 
+      val num_list = folded(i).map(_.trim.toLong)
+      ops_line(i) match {
+        case "*" => num_list.reduce(_ * _)
+        case "+" => num_list.reduce(_ + _)
+        case _ => 0
+      }
+    })
 
     val output1 = math_processor.sum
-    val output2 = 0 //math_processor_c.sum
+    val output2 = math_processor_2.sum
 
     println(output1)
     println(output2)
@@ -49,7 +75,7 @@ object Day6 {
   def main(args: Array[String]): Unit = {
     val app = new Day6()
 
-  app.run("./src/main/scala/aoc2025/Day6/Example.txt")
-  // app.run("./src/main/scala/aoc2025/Day6/Input.txt")
+  // app.run("./src/main/scala/aoc2025/Day6/Example.txt")
+  app.run("./src/main/scala/aoc2025/Day6/Input.txt")
   }
 }
